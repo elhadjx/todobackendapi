@@ -1,0 +1,13 @@
+- Create account with only email address
+        Use JWT to confirm email (after confirming email, user directly gets logged in)
+- Login using only email address
+
+- Handle todos with AJAX
+
+- Add Todo ( Title required, Description optional, End date optional)
+- Read todos
+- Reorganize todos easily
+- Toggle todos
+
+- Email reminder on a todo's end date
+- Create embedded todos
