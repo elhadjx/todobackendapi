@@ -1,11 +1,11 @@
 require('dotenv').config();
 const express = require('express')
-const connectDB = require('./config/db')
+const { connectDB } = require('./config/db')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose')
-
+const users = require('./routes/users')
 
 const PORT = process.env.PORT || 3500
 
@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({
 app.use(cors());
 app.use(morgan('common'))
 
-app.use('/users', require('./routes/users'))
+app.use('/users', users);
 
 connectDB()
 

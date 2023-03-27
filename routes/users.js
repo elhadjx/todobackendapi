@@ -1,17 +1,23 @@
-
-const router = require('express').Router();
+const express = require('express');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { authenticateToken } = require('../config/jwt');
 const sendMail = require('../config/nodemailer');
-const bodyParser = require('body-parser');
-const auth = require('../middleware/auth');
 const { getUser } = require('../config/db');
+const router = express.Router();
+const bodyParser = require('body-parser');
+
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({
+    extended: true
+}));
 
 //Create a user 
 router.post('/', async (req, res) => {
     try {
-        const user = new User(req.body)
+        const { email } = req.body;
+        const user = new User()
+        user.email = email;
         user.save(function (err, doc) {
             if (err) {
                 res.send(err);
@@ -36,17 +42,17 @@ router.post('/', async (req, res) => {
 
 // Login a user 
 router.post('/login', async (req, res) => {
-
     try {
         const { email } = req.body;
         //Login with sending an email to the user
         let emailToken = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        sendMail('ToDid',
+        await sendMail('ToDid',
             email,
             'Login to ToDid',
             `Hi there, To login to ToDid:
             <a href="${process.env.HOST}/users/${emailToken}/todos">Login</a>`
         );
+        res.send('Email sent')
     } catch (error) {
         console.log(error)
         res.send(error)
@@ -56,7 +62,6 @@ router.post('/login', async (req, res) => {
 
 // Get all user todos
 router.get('/:token/todos', authenticateToken, async (req, res) => {
-    // Get user email from token
     const { email } = req.user;
     try {
         let user = await getUser(email);
@@ -66,7 +71,6 @@ router.get('/:token/todos', authenticateToken, async (req, res) => {
         console.log(error)
         res.send(error)
     }
-
 });
 
 // Create a todo for a user 
@@ -178,3 +182,5 @@ router.delete('/:token/todos/:todoId', authenticateToken, async (req, res) => {
     }
 });
 
+
+module.exports = router;
